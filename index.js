@@ -88,7 +88,7 @@ function findEntropy(lang = 'ua', text) {
   return alphabetEntropy;
 }
 
-/////////
+///////// АЛГОРИТМ КОДИРОВКИ И ДЕКОДИРОВКИ
 
 function b64ToUint6(nChr) {
   return nChr > 64 && nChr < 91
@@ -156,10 +156,6 @@ function base64EncArr(aBytes) {
   let nUint24 = 0;
   for (let nIdx = 0; nIdx < nLen; nIdx++) {
     nMod3 = nIdx % 3;
-    // To break your base64 into several 80-character lines, add:
-    //   if (nIdx > 0 && ((nIdx * 4) / 3) % 76 === 0) {
-    //      sB64Enc += "\r\n";
-    //    }
 
     nUint24 |= aBytes[nIdx] << ((16 >>> nMod3) & 24);
     if (nMod3 === 2 || aBytes.length - nIdx === 1) {
@@ -177,7 +173,7 @@ function base64EncArr(aBytes) {
   );
 }
 
-/* UTF-8 array to JS string and vice versa */
+/* UTF-8 array to JS string and JS string to UTF-8 array */
 
 function UTF8ArrToStr(aBytes) {
   let sView = '';
@@ -187,8 +183,7 @@ function UTF8ArrToStr(aBytes) {
     nPart = aBytes[nIdx];
     sView += String.fromCodePoint(
       nPart > 251 && nPart < 254 && nIdx + 5 < nLen /* six bytes */
-        ? /* (nPart - 252 << 30) may be not so safe in ECMAScript! So…: */
-          (nPart - 252) * 1073741824 +
+        ? (nPart - 252) * 1073741824 +
             ((aBytes[++nIdx] - 128) << 24) +
             ((aBytes[++nIdx] - 128) << 18) +
             ((aBytes[++nIdx] - 128) << 12) +
