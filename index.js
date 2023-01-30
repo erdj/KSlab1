@@ -7,7 +7,7 @@ fileInput$.addEventListener('change', () => {
     // отримуємо символ із інпута
     const symbol = document.querySelector('.symbol-selector').value;
 
-    // присвоюємо текст з файл у змінну
+    // присвоюємо текст з файлу у змінну
     const text = textFile.result;
 
     // якщо довжина символа дорівнює 1, то рахуємо його вірогідність появи у тексті
@@ -20,11 +20,11 @@ fileInput$.addEventListener('change', () => {
       );
     }
 
-    // щоб знайт ентропію, використаємо функцію
-    const textEntrophy = findEntropy('ua', text);
+    // щоб знайти ентропію, використаємо функцію
+    const textEntrophy = findEntropy(text);
     console.log('text entrophy is', textEntrophy);
 
-    // знайдемо кылькысть ынформацыъ тексту
+    // знайдемо кількість інформації тексту
     const ammountOfInformationInText = textEntrophy * text.length;
     console.log('the ammount of the text information (bytes)', ammountOfInformationInText / 8);
     console.log('the ammount of the text information (bits)', ammountOfInformationInText);
@@ -54,7 +54,7 @@ fileInput$.addEventListener('change', () => {
     console.log(sMyOutput, '\n');
 
     // розрахунок ентропії base-64 тексту
-    const base64TextEntrophy = findEntropy('en', sMyBase64);
+    const base64TextEntrophy = findEntropy(sMyBase64);
     console.log('\nbase64 entrophy', base64TextEntrophy);
 
     // розрахунок кількості інформації base-64 тексту
@@ -82,29 +82,26 @@ function getSymbolCount(symb, text) {
   return text.toLowerCase().split(symb.toLowerCase()).length - 1;
 }
 
-function findEntropy(lang = 'ua', text) {
-  let alphabet;
-  // для різного тексту - різний алфавіт,
-  if (lang === 'ua') {
-    alphabet = 'абвгґдеєжзиіїйклмнопрстуфхцчшщьюя';
-  } else if (lang === 'en') {
-    alphabet = 'abcdefghijklmnopqrstuvwxyz';
-  }
+function findEntropy(text) {
+  let frequency = {};
+  let entropy = 0;
+  let len = text.length;
 
-  let alphabetEntropy = 0;
-
-  for (let i = 0; i < alphabet.length; i++) {
-    // реалізація знаходження ентропії алфавыту (все по формулі Σ(p_i * log2(1/p_i)))
-    const letter = alphabet[i];
-
-    const letterCount = getSymbolCount(letter, text);
-    const letterProbability = letterCount / text.length;
-    if (letterProbability !== 0) {
-      const letterEntropy = letterProbability * Math.log2(1 / letterProbability);
-      alphabetEntropy += letterEntropy;
+  for (let i = 0; i < len; i++) {
+    let character = text.charAt(i);
+    if (!(character in frequency)) {
+      frequency[character] = 0;
     }
+    frequency[character]++;
   }
-  return alphabetEntropy;
+
+  for (let char in frequency) {
+    let frequencyProb = frequency[char] / len;
+    entropy -= frequencyProb * Math.log2(frequencyProb);
+  }
+
+  // console.log(frequency);
+  return entropy;
 }
 
 ///////// АЛГОРИТМ КОДУВАННЯ ТА ДЕОКОДУВАННЯ
